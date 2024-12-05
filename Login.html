@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Registration Page</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <style>
+      /* styles.css - Combined CSS for Login and Registration */
+      body {
+          font-family: 'Roboto Mono', monospace;
+          background-color: #212529;
+          color: #e9ecef;
+          margin: 0;
+          padding: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+        }
+        
+        .container { /* Common container class */
+          background-color: #282c34;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          padding: 30px;
+          width: 350px;
+          text-align: center;
+        }
+        
+        h2 {
+          color: #e9ecef;
+          margin-bottom: 20px;
+        }
+        
+        .form-group {
+          margin-bottom: 15px;
+        }
+        
+        label {
+          display: block;
+          margin-bottom: 5px;
+          color: #ced4da;
+          font-weight: 500;
+        }
+        
+        input,
+        textarea {
+          width: 100%;
+          padding: 10px;
+          border: 1px solid #495057;
+          border-radius: 4px;
+          background-color: #343a40;
+          color: #e9ecef;
+          transition: border-color 0.3s ease;
+        }
+        
+        input:focus,
+        textarea:focus {
+          outline: none;
+          border-color: #ffc107;
+        }
+        
+        .role-buttons {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 20px;
+        }
+        
+        button {
+          background-color: #007bff;
+          color: #fff;
+          border: none;
+          padding: 10px 15px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 16px;
+          transition: background-color 0.3s ease;
+          flex: 1;
+          margin: 0 5px;
+        }
+        
+        button:hover {
+          background-color: #0056b3;
+        }
+        
+        .error {
+          color: #dc3545;
+          font-size: 14px;
+          margin-top: 10px;
+          display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container"> 
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+                <small class="error" id="usernameError"></small>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+                <small class="error" id="passwordError"></small>
+            </div>
+            <div class="role-buttons">
+                <button type="button" id="userLogin">Login as User</button>
+                <button type="button" id="officerLogin">Login as Officer</button>
+            </div>
+        </form>
+
+        <h2>Register</h2>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="regName">Name</label>
+                <input type="text" id="regName" name="regName" required>
+                <small class="error" id="regNameError"></small>
+            </div>
+            <div class="form-group">
+                <label for="regEmail">Email</label>
+                <input type="email" id="regEmail" name="regEmail" required>
+                <small class="error" id="regEmailError"></small>
+            </div>
+            <div class="form-group">
+                <label for="regMobile">Mobile Number</label>
+                <input type="tel" id="regMobile" name="regMobile" required>
+                <small class="error" id="regMobileError"></small>
+            </div>
+            <div class="form-group">
+                <label for="regAddress">Address</label>
+                <input type="text" id="regAddress" name="regAddress" required>
+                <small class="error" id="regAddressError"></small>
+            </div>
+            <div class="form-group">
+                <label for="regUsername">Username</label>
+                <input type="text" id="regUsername" name="regUsername" required>
+                <small class="error" id="regUsernameError"></small>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">Password</label>
+                <input type="password" id="regPassword" name="regPassword" required>
+                <small class="error" id="regPasswordError"></small>
+            </div>
+            <div class="form-group">
+                <label for="regPreferences">Preferences</label>
+                <textarea id="regPreferences" name="regPreferences"></textarea>
+            </div>
+            <button type="button" id="registerButton">Register</button>
+            <button type="reset" id="resetButton">Reset</button>
+        </form>
+    </div>
+    <script src="script.js"></script> 
+    <script>
+      // script.js - Combined JavaScript for Login and Registration
+      document.getElementById('userLogin').addEventListener('click', function () {
+          handleLogin('Customer');
+      });
+      
+      document.getElementById('officerLogin').addEventListener('click', function () {
+          handleLogin('Officer');
+      });
+      
+      function handleLogin(role) {
+          // Clear previous error messages
+          document.getElementById('usernameError').style.display = 'none';
+          document.getElementById('passwordError').style.display = 'none';
+      
+          const username = document.getElementById('username').value.trim();
+          const password = document.getElementById('password').value.trim();
+      
+          let isValid = true;
+      
+          // Validate username
+          if (!username) {
+              document.getElementById('usernameError').textContent = 'Username is required.';
+              document.getElementById('usernameError').style.display = 'block';
+              isValid = false;
+          }
+      
+          // Validate password
+          const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{1,30}$/;
+          if (!password) {
+              document.getElementById('passwordError').textContent = 'Password is required.';
+              document.getElementById('passwordError').style.display = 'block';
+              isValid = false;
+          } else if (!passwordPattern.test(password)) {
+              document.getElementById('passwordError').textContent = 'Password must be 1-30 characters long, with at least one uppercase, one lowercase, and one special character.';
+              document.getElementById('passwordError').style.display = 'block';
+              isValid = false;
+          }
+      
+          if (isValid) {
+              // Save user details (role and username) to localStorage
+              localStorage.setItem('username', username);
+              localStorage.setItem('role', role);
+      
+              // Generate Customer ID if the user is a customer
+              if (role === 'Customer' && !localStorage.getItem('customerId')) {
+                  const customerId = Math.floor(100000 + Math.random() * 900000); // 6-digit random number
+                  localStorage.setItem('customerId', customerId);
+              }
+      
+              // Redirect to the homepage
+              window.location.href = "homepage.html"; 
+          }
+      }
+      
+      document.getElementById('registerButton').addEventListener('click', function() {
+          // 1. Get values from registration form fields
+          const name = document.getElementById('regName').value.trim();
+          const email = document.getElementById('regEmail').value.trim();
+          const mobile = document.getElementById('regMobile').value.trim();
+          const address = document.getElementById('regAddress').value.trim();
+          const username = document.getElementById('regUsername').value.trim();
+          const password = document.getElementById('regPassword').value.trim();
+          const preferences = document.getElementById('regPreferences').value;
+      
+          // 2. Basic validation (you can add more robust validation)
+          let isValid = true;
+          if (!name || !email || !mobile || !address || !username || !password) {
+              alert("All fields are required!");
+              isValid = false;
+          }
+      
+          // 3. If valid, save user data (consider using localStorage or sending to a server)
+          if (isValid) {
+              // Example using localStorage (replace with your actual storage logic)
+              const user = {
+                  name: name,
+                  email: email,
+                  mobile: mobile,
+                  address: address,
+                  username: username,
+                  password: password,
+                  preferences: preferences
+              };
+              localStorage.setItem(username, JSON.stringify(user));
+      
+              // 4. Optionally, redirect to a success page or login page
+              alert("Registration successful!");
+              // window.location.href = "login.html"; 
+          }
+      });      
+    </script>
+</body>
+</html>

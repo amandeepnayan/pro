@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Service</title>
+  <link rel="stylesheet" href="booking.css"> 
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet"> 
+  <style>
+    /* Add CSS for error messages */
+    .error {
+      color: red;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Enter Booking Details</h1>
+    <form id="bookingForm">
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Sender Information</h2>
+        </div>
+        <div class="form-group">
+          <label for="senderName">Sender Name:</label>
+          <input type="text" id="senderName" name="senderName" required> 
+          <span id="senderNameError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="senderAddress">Sender Address:</label>
+          <input type="text" id="senderAddress" name="senderAddress" required>
+          <span id="senderAddressError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="senderMobile">Sender Mobile:</label>
+          <input type="tel" id="senderMobile" name="senderMobile" pattern="[0-9]{10}" required> 
+          <span id="senderMobileError" class="error"></span>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Receiver Information</h2>
+        </div>
+        <div class="form-group">
+          <label for="receiverName">Receiver Name:</label>
+          <input type="text" id="receiverName" name="receiverName" required>
+          <span id="receiverNameError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="receiverAddress">Receiver Address:</label>
+          <input type="text" id="receiverAddress" name="receiverAddress" required>
+          <span id="receiverAddressError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="receiverMobile">Receiver Mobile:</label>
+          <input type="tel" id="receiverMobile" name="receiverMobile" pattern="[0-9]{10}" required>
+          <span id="receiverMobileError" class="error"></span>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Parcel Details</h2>
+        </div>
+        <div class="form-group">
+          <label for="weight">Parcel Weight (kg):</label>
+          <input type="number" id="weight" name="weight" min="0" step="0.1" required>
+          <span id="weightError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="parcelDescription">Parcel Description:</label>
+          <textarea id="parcelDescription" name="parcelDescription"></textarea> 
+          <span id="parcelDescriptionError" class="error"></span>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Shipping Options</h2>
+        </div>
+        <div class="form-group">
+          <label for="deliveryOption">Delivery Option:</label>
+          <select id="deliveryOption" name="deliveryOption" required>
+            <option value="">--Select--</option>
+            <option value="standard">Standard</option>
+            <option value="express">Express</option>
+          </select>
+          <span id="deliveryOptionError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="packingOption">Packing Option:</label>
+          <select id="packingOption" name="packingOption" required>
+            <option value="">--Select--</option>
+            <option value="eco">Eco-Friendly</option>
+            <option value="standard">Standard</option>
+          </select>
+          <span id="packingOptionError" class="error"></span>
+        </div>
+        <div class="form-group"> 
+          <input type="checkbox" id="insurance" name="insurance">
+          <label for="insurance">Add Insurance (+ ₹200)</label>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Date and Time</h2>
+        </div>
+        <div class="form-group">
+          <label for="pickupDate">Pickup Date:</label>
+          <input type="date" id="pickupDate" name="pickupDate" required>
+          <span id="pickupDateError" class="error"></span>
+        </div>
+        <div class="form-group">
+          <label for="pickupTime">Pickup Time:</label>
+          <input type="time" id="pickupTime" name="pickupTime" required>
+          <span id="pickupTimeError" class="error"></span>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-header">
+          <h2>Cost Summary</h2>
+          <p id="costSummary"></p> 
+        </div>
+        <button type="button" id="calculateCost">Calculate Cost</button>
+      </div>
+
+      <button type="submit" id="submitBooking">Submit Booking</button>
+
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const role = localStorage.getItem('role');
+    const username = localStorage.getItem('username');
+
+    // Pre-fill sender details for the Customer
+    if (role === 'Customer') {
+        document.getElementById('senderName').value = username || 'John Doe'; // Example name
+        document.getElementById('senderAddress').value = '123 Customer Street, City'; // Example address
+        document.getElementById('senderMobile').value = '9876543210'; // Example mobile number
+
+        // Make sender details readonly for Customers
+        ['senderName', 'senderAddress', 'senderMobile'].forEach(field => {
+            document.getElementById(field).readOnly = true;
+        });
+    } 
+
+    // Cost Calculation with Validation and Console Logging
+    document.getElementById('calculateCost').addEventListener('click', function () {
+        const weight = parseFloat(document.getElementById('weight').value || 0);
+        const packingOption = document.getElementById('packingOption').value;
+        const deliveryOption = document.getElementById('deliveryOption').value;
+
+        // Validation
+        let isValid = true;
+        document.getElementById('costSummary').textContent = ""; // Clear cost summary
+        document.querySelectorAll('.error').forEach(error => (error.textContent = "")); // Clear previous errors
+
+        if (!weight || isNaN(weight) || weight <= 0) {
+            document.getElementById('weightError').textContent = "Please enter a valid weight.";
+            isValid = false;
+        }
+        if (!packingOption) {
+            document.getElementById('packingOptionError').textContent = "Please select a packing option.";
+            isValid = false;
+        }
+        if (!deliveryOption) {
+            document.getElementById('deliveryOptionError').textContent = "Please select a delivery option.";
+            isValid = false;
+        }
+
+        if (isValid) {
+            console.log("Weight:", weight);
+            console.log("Packing Option:", packingOption);
+            console.log("Delivery Option:", deliveryOption);
+            console.log("Insurance:", document.getElementById('insurance').checked);
+
+            // Calculate cost
+            let cost = weight * 10; // Base cost per kg
+            if (packingOption === 'eco') cost += 50;
+            if (deliveryOption === 'express') cost += 100;
+            if (document.getElementById('insurance').checked) cost += 200;
+
+            document.getElementById('costSummary').textContent = `Cost: ₹${cost}`;
+            localStorage.setItem('calculatedCost', cost); // Store cost in localStorage
+        }
+    });
+
+    // Booking Submission with Validation and Console Logging
+    document.getElementById('submitBooking').addEventListener('click', function () {
+        const senderName = document.getElementById('senderName').value.trim();
+        const senderAddress = document.getElementById('senderAddress').value.trim();
+        const senderMobile = document.getElementById('senderMobile').value.trim();
+        const receiverName = document.getElementById('receiverName').value.trim();
+        const receiverAddress = document.getElementById('receiverAddress').value.trim();
+        const receiverMobile = document.getElementById('receiverMobile').value.trim();
+        const weight = document.getElementById('weight').value.trim();
+        const packingOption = document.getElementById('packingOption').value;
+        const deliveryOption = document.getElementById('deliveryOption').value;
+        const pickupDate = document.getElementById('pickupDate').value.trim();
+        const deliveryDate = document.getElementById('deliveryDate').value.trim();
+        const description = document.getElementById('parcelDescription').value.trim();
+        const pickupTime = document.getElementById('pickupTime').value.trim();
+        const deliveryTime = document.getElementById('deliveryTime').value.trim();
+        const insurance = document.getElementById('insurance').checked;
+
+        let isValid = true;
+        document.querySelectorAll('.error').forEach(error => (error.textContent = "")); // Clear previous errors
+
+        // Field-specific validations
+        function validateField(field, errorId, message) {
+            if (!field) {
+                document.getElementById(errorId).textContent = message;
+                isValid = false;
+            }
+        }
+
+        // Sender details
+        validateField(senderName, 'senderNameError', 'Sender name is required.');
+        validateField(senderAddress, 'senderAddressError', 'Sender address is required.');
+        validateField(senderMobile, 'senderMobileError', 'Sender mobile number is required.');
+
+        // Receiver details
+        validateField(receiverName, 'receiverNameError', 'Receiver name is required.');
+        validateField(receiverAddress, 'receiverAddressError', 'Receiver address is required.');
+        validateField(receiverMobile, 'receiverMobileError', 'Receiver mobile number is required.');
+
+        // Parcel details
+        validateField(weight, 'weightError', 'Parcel weight is required.');
+        validateField(packingOption, 'packingOptionError', 'Please select a packing option.');
+        validateField(deliveryOption, 'deliveryOptionError', 'Please select a delivery option.');
+
+        // Date validations
+        const today = new Date().toISOString().split('T')[0];
+        if (!pickupDate || pickupDate < today) {
+            document.getElementById('pickupDateError').textContent = 'Pickup date must be today or a future date.';
+            isValid = false;
+        }
+        if (!deliveryDate || deliveryDate < pickupDate) {
+            document.getElementById('deliveryDateError').textContent =
+                'Delivery date must be the same or later than the pickup date.';
+            isValid = false;
+        }
+        if (!pickupTime) {
+            document.getElementById('pickupTimeError').textContent = 'Pickup time is required.';
+            isValid = false;
+        }
+        if (!deliveryTime) {
+            document.getElementById('deliveryTimeError').textContent = 'Delivery time is required.';
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Store each field in localStorage
+            localStorage.setItem('receiverName', receiverName);
+            localStorage.setItem('receiverAddress', receiverAddress);
+            localStorage.setItem('receiverMobile', receiverMobile);
+            localStorage.setItem('weight', weight);
+            localStorage.setItem('parcelDescription', description);
+            localStorage.setItem('pickupTime', pickupTime);
+            localStorage.setItem('deliveryTime', deliveryTime);
+            localStorage.setItem('packingOption', packingOption);
+            localStorage.setItem('deliveryOption', deliveryOption);
+            localStorage.setItem('insurance', insurance);
+            localStorage.setItem('pickupDate', pickupDate);
+            localStorage.setItem('deliveryDate', deliveryDate);
+
+            console.log("Redirecting to payment page...");
+            alert('Booking submitted successfully!');
+            window.location.href = 'payment.html'; // Redirect to payment page
+        }
+    });
+});
+
+function logout() {
+    localStorage.clear();
+    window.location.href = 'Login.html';
+}
+  </script>
+</body>
+</html>
